@@ -27,6 +27,6 @@ portfolio-oidc>
 
       - name: Build, tag, and push image
         run: |
-          IMAGE_URI=<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/portfolio-app:latest
+          IMAGE_URI=<855335083395>.dkr.ecr.us-east-1.amazonaws.com/portfolio-app:latest
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
