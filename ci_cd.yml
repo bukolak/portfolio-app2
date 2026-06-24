@@ -37,9 +37,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker image
-        run: |
-          IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
-          docker build -t $IMAGE_URI:${{ env.IMAGE_TAG }} -t $IMAGE_URI:latest .
+  run: |
+    docker build \
+      --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+      --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest \
+      .
 
       - name: Push Docker image to ECR
         run: |
