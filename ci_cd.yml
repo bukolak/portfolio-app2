@@ -38,7 +38,7 @@ jobs:
 
       - name: Build Docker image
   run: |
-    docker build \
+    docker build -t\
       --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
       --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest \
       .
