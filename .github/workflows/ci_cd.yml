@@ -38,7 +38,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
+          docker build \
             --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} \
             --tag ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest \
             .
@@ -57,6 +57,7 @@ jobs:
     name: Scan Image with Trivy
     runs-on: ubuntu-latest
     needs: build-and-push
+
     permissions:
       id-token: write
       contents: read
@@ -85,6 +86,7 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: "1"
           ignore-unfixed: true
+
       - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         if: always()
@@ -92,10 +94,10 @@ jobs:
           sarif_file: trivy-results.sarif
 
   deploy:
-        name: Deploy to ECS
-        runs-on: ubuntu-latest
-        needs: trivy-scan # won't run if trivy-scan fails
-        environment: production
+    name: Deploy to ECS
+    runs-on: ubuntu-latest
+    needs: trivy-scan
+    environment: production
 
     steps:
       - name: Configure AWS credentials
@@ -129,4 +131,5 @@ jobs:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           cluster: ${{ secrets.ECS_CLUSTER_NAME }}
           service: ${{ secrets.ECS_SERVICE_NAME }}
-          wait-for-service-stability: true  
+          wait-for-service-stability: true
+
