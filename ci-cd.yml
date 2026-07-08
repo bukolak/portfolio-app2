@@ -1,7 +1,6 @@
 name: Build And push to ECR
 on:
   push:
-      #pull_request:
           branches: [ 'main']
 jobs:
     build_scan:
