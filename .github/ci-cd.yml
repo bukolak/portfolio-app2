@@ -20,7 +20,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::855335083395:role/github-action-role
+          role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: us-east-1
 
       - name: Trivy Scan (filesystem)
@@ -31,12 +31,12 @@ jobs:
           exit-code: 0
 
       - name: Build docker image
-        run: docker build -t 855335083395.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest .
+        run: docker build -t ${{ secrets.AWS_REPO }}:latest .
 
       - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
-          image-ref: 855335083395.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest
+          image-ref: ${{ secrets.AWS_REPO }}my-repo:latest
           format: table
           exit-code: 1
           ignore-unfixed: true
@@ -46,7 +46,18 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 \
             | docker login --username AWS \
-              --password-stdin 855335083395.dkr.ecr.us-east-1.amazonaws.com
+              --password-stdin ${{ secrets.AWS_REPO }}
 
       - name: Push image to ECR
-        run: docker push 855335083395.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest
+        run: docker push ${{ secrets.AWS_REPO }}:/my-repo:latest
+  Deploy to ECS:
+  needs: build_scan
+  runs-on: ubuntu-latest
+  steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: us-east-1
+      - name: Deploy to ECS
+        run: echo "Deploying to ECS..."
